@@ -5,12 +5,13 @@ from .serializers import BookSerializer
 from .serializers import UserSerializer,ReviewSerializer
 from .models import Book
 from django.contrib.auth.models import User
-from django.contrib.auth import authenticate, login 
+from django.contrib.auth import authenticate, login as auth_login 
 from django.contrib.auth.hashers import make_password
 from rest_framework import status
 from django.utils import timezone
 from rest_framework.response import Response
 from django.views.decorators.csrf import csrf_exempt
+from django.db.models import Q
 
 
 @api_view(['GET'])
@@ -23,6 +24,16 @@ def books(request):
 @api_view(['POST'])
 def create_book(request):
     if request.method == 'POST':
+         
+        existing_books = Book.objects.filter(
+            book_name=request.data.get('book_name'),
+            book_author=request.data.get('book_author')
+        )
+        if existing_books.exists():
+            return Response(
+                {"message": "A book with the same name and author already exists."},
+                status=400
+            )
         # Create the book with the modified data
         serializer = BookSerializer(data=request.data)
         if serializer.is_valid():
@@ -63,8 +74,8 @@ def signup(request):
 @api_view(['POST'])
 def login(request):
     if request.method == 'POST':
-        username = request.data.get('username', None)
-        password = request.data.get('password', None)
+        username = request.data.get('username')
+        password = request.data.get('password')
 
         if not username or not password:
             return Response({'message': 'Both username and password are required'}, status=400)
@@ -72,7 +83,7 @@ def login(request):
         user =authenticate(username=username, password=password)
         print(user)
         if user is not None:
-            login(request, user)
+            auth_login(request, user)
             return Response({'message': 'Login successful'})
         else:
             # Authentication failed
@@ -91,13 +102,11 @@ def book_detail(request, pk):
         
         book_serializer = BookSerializer(book)
 
-        # Get all reviews related to the book
         reviews = book.reviews.all()
 
         # Serialize the reviews
         review_serializer = ReviewSerializer(reviews, many=True)
 
-        # Combine book data and reviews data
         response_data = {
             'book': book_serializer.data,
             'reviews': review_serializer.data
@@ -105,12 +114,16 @@ def book_detail(request, pk):
 
         return Response(response_data)
 
+@csrf_exempt
+@api_view(['GET'])
 def search_books(request):
     if request.method == 'GET':
-        book_name = request.GET.get('name')  # Get the value of 'name' parameter from the query string
+        book_name = request.GET.get('name')  
         
         if book_name:
-            books = Book.objects.filter(BookName__icontains=book_name)  # Perform case-insensitive partial match search
+            books = Book.objects.filter(
+                Q(book_name__icontains=book_name) | Q(book_name__startswith=book_name)
+            ) # Perform case-insensitive partial match search
             serializer = BookSerializer(books, many=True)
             return Response(serializer.data)
         else:
@@ -120,7 +133,7 @@ def search_books(request):
 @api_view(['POST'])
 def create_review(request, book_id):
     if request.method == 'POST':
-        if request.user.is_authenticated:
+        # if request.user.is_authenticated:
             # Retrieve the book object
             try:
                 book = Book.objects.get(pk=book_id)
@@ -131,10 +144,12 @@ def create_review(request, book_id):
             reviewed_by = request.user
 
             # Create the review with the submitted data
-            request.data['book'] = book.pk
-            request.data['reviewed_by'] = reviewed_by.id
-            request.data['date_of_review'] = timezone.now()
-            serializer = ReviewSerializer(data=request.data)
+            mutable_data = request.data.copy()
+
+            mutable_data['book'] = book.pk
+            mutable_data['reviewed_by'] = reviewed_by.id
+            mutable_data['date_of_review'] = timezone.now()
+            serializer = ReviewSerializer(data=mutable_data)
             
             if serializer.is_valid():
                 serializer.save()
@@ -142,6 +157,6 @@ def create_review(request, book_id):
                     "message": "Review created successfully",
                 }, status=201)
             return Response(serializer.errors, status=400)
-        else:
-            return Response({"error": "Please log in to create a review"}, status=401)              
+        # else:
+        #     return Response({"message": "Please log in to create a review"}, status=401)              
     
