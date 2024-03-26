@@ -139,7 +139,7 @@ const handleDetailClick =(bookId) => {
          
             <div className="card-body">
               <h5 className="card-title">{book.book_name}</h5>
-              <h6 className="card-text">author : {book.book_author}</h6>
+              <h6 className="card-text">Author : {book.book_author}</h6>
              
             </div>
         </div>

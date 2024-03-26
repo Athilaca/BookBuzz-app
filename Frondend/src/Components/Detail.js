@@ -24,19 +24,24 @@ const Detail = () => {
     fetchBook();
   }, [bookId]);
 
-  useEffect(() => {
-    fetchCsrfToken();
-  }, []);
+  function getCookie(name) {
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) return parts.pop().split(';').shift();
+}
 
-  const fetchCsrfToken = async () => {
-    try {
-      const response = await axios.get('http://127.0.0.1:8000/csrf_cookie/');
-      const csrfToken = response.headers['csrftoken'];
-      setCsrfToken(csrfToken);
-    } catch (error) {
-      console.error('Failed to fetch CSRF token:', error);
-    }
-  };
+  //   useEffect(() => {
+  //   fetchCsrfToken();
+  // }, []);
+
+  // const fetchCsrfToken = async () => {
+  //   try {
+  //     const response = await axios.get('http://127.0.0.1:8000/csrf_cookie/');
+  //     setCsrfToken(response.data.csrfToken);
+  //   } catch (error) {
+  //     console.error('Failed to fetch CSRF token:', error);
+  //   }
+  // };
 
   const handleCommentChange = (e) => {
     setComment(e.target.value);
@@ -46,6 +51,7 @@ const Detail = () => {
     e.preventDefault();
 
     try {
+      const csrfToken = getCookie('csrftoken');
       const response = await axios.post(`http://127.0.0.1:8000/books/${bookId}/reviews/`, { comment }, {
         headers: {
           'X-CSRFToken': csrfToken
@@ -58,6 +64,8 @@ const Detail = () => {
       console.error('Error submitting review:', error);
       // Add error handling logic here
     }
+
+  
   };
 
   return (
@@ -66,12 +74,12 @@ const Detail = () => {
         <div className="row">
 
           <div className='row'>
-            <div className="col-md-6">
+            <div className="col-md-3">
               <img src={`http://127.0.0.1:8000${book?.book.book_image}`} alt="Book" className="book-image" />
             </div>
             <div className="col-md-6">
-              <h2>{book?.book.book_name}</h2>
-              <h6>author: {book?.book.book_author}</h6>
+              <h2>Book: {book?.book.book_name}</h2>
+              <h6>Author: {book?.book.book_author}</h6>
               <br></br>
               <p>Description Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam scelerisque metus nec fermentum consectetur.
                 Description Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam scelerisque metus nec fermentum consectetur.
@@ -85,6 +93,7 @@ const Detail = () => {
                 <h3 className='review-title'>Reviews</h3>
                 <div className="review-scroll">
                   <div className="review-item">
+                     <ul className="review-list">
                     {book.reviews.map((review, index) => (
                       <li key={index}>
                         <p>User: {review.reviewed_by}</p>
@@ -93,6 +102,7 @@ const Detail = () => {
                         <hr />
                       </li>
                     ))}
+                    </ul>
                   </div>
                 </div>
               </div>
@@ -101,7 +111,7 @@ const Detail = () => {
 
           <form className="review-form" onSubmit={handleReviewSubmit}>
             <div className="form-group">
-              <label htmlFor="comment">Comment:</label>
+              <label htmlFor="comment">Comment review:</label>
               <textarea id="comment" name="comment" value={comment} onChange={handleCommentChange}></textarea>
             </div>
             <button className="mb-5" type="submit">Submit Review</button>

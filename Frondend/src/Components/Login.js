@@ -32,10 +32,12 @@ const Login = () => {
   const handleSubmit = async(e) => {
     e.preventDefault();
      try {
-      const response = await axios.post('http://127.0.0.1:8000/login/', formData, {
-        headers: {
-          'X-CSRFToken': csrfToken
-        }});      
+      const response = await axios.post('http://127.0.0.1:8000/login/', formData, 
+      // {
+      //   headers: {
+      //     'X-CSRFToken': csrfToken
+      //   }}
+        );      
       console.log('Login successful:', response.data);
        
       // Handle success (e.g., show success message, redirect user)
