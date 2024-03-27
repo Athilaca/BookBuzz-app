@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import './Details.css';
-import bookImage from '../assets/book.jpg';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
+import { FaUser } from 'react-icons/fa';
 
 const Detail = () => {
   const { bookId } = useParams();
@@ -96,7 +96,7 @@ const Detail = () => {
                      <ul className="review-list">
                     {book.reviews.map((review, index) => (
                       <li key={index}>
-                        <p>User: {review.reviewed_by}</p>
+                        <p> <FaUser className="me-2" />User: {review.reviewed_by}</p>
                         <p>Date: {review.date_of_review}</p>
                         <p>Review: {review.book_review}</p>
                         <hr />

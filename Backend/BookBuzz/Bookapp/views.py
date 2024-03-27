@@ -147,12 +147,12 @@ def create_review(request, book_id):
             mutable_data = request.data.copy()
 
             mutable_data['book'] = book.pk
-            mutable_data['reviewed_by'] = reviewed_by.id
+            # mutable_data['reviewed_by'] = reviewed_by.id
             mutable_data['date_of_review'] = timezone.now()
             serializer = ReviewSerializer(data=mutable_data)
             
             if serializer.is_valid():
-                serializer.save()
+                serializer.save(reviewed_by=request.user)
                 return Response({
                     "message": "Review created successfully",
                 }, status=201)

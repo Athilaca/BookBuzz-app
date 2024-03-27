@@ -8,6 +8,7 @@ class BookSerializer(serializers.ModelSerializer):
         fields = ['book_id', 'book_name', 'book_image','book_author']
 
 class ReviewSerializer(serializers.ModelSerializer):
+    reviewed_by = serializers.ReadOnlyField(source='reviewed_by.username')
     class Meta:
         model = Review
         fields = ['book', 'book_review', 'date_of_review', 'reviewed_by']        

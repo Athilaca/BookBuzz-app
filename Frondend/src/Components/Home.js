@@ -166,7 +166,10 @@ const handleDetailClick =(bookId) => {
 
     <div >
         <h3 className="add-book-heading">About</h3>
-        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+        <p className='m-3'>Welcome to BookBuzz, your go-to destination for discovering, discussing, and sharing your love for books. At BookBuzz,
+           we believe in the power of literature to inspire, enlighten, and connect people from all walks of life.
+           Whether you're a seasoned bibliophile or just starting your reading journey, BookBuzz is here to enrich your literary experience by sharing the reviews.
+           BookBuzz is not just a review site; it's a place for meaningful conversations about books. Engage with fellow readers, share your thoughts, and discover new perspectives.</p>
     </div>
       <hr></hr>
     </>
